@@ -1,0 +1,29 @@
+{% extends "main/layout/base.djt" %}
+{% load staticfiles %}
+{%block content%}
+<br><br>
+	<div class="ui centered grid break">
+		{%for q in quotes%}
+			<div class="eight wide centered column">
+					<div class="ui center aligned segment test">
+						<img class="ui medium bordered centered image" src="/{{q.student.image}}" alt="">
+						<h2>{{q.student.name}}</h2>
+						<h3>{{q.student.rollno}}</h3>
+						<div class="ui divider"></div>
+						<h3>{{q.quote}}</h3>
+					</div>
+			</div>
+		{%endfor%}
+		</div>
+{%endblock%}
+{% block scripts %}
+	<script>
+	$(function() {
+	$('.test').matchHeight({
+    byRow: true,
+    property: 'height',
+    target: null,
+    remove: false});
+});
+	</script>
+{% endblock %}
