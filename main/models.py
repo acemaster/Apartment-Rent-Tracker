@@ -15,6 +15,7 @@ class Customer(models.Model):
     user = models.OneToOneField(User)
     mobile_no = models.CharField(max_length=100)
     rent_paid = models.BooleanField(default=True)
+    rent = models.CharField(max_length=100)
     def __unicode__(self):
     	return self.user.first_name
 

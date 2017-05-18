@@ -1,0 +1,28 @@
+{% extends "main/layout/base.djt" %}
+{% load staticfiles %}
+{%block content%}
+<br><br><br>
+<div class="ui fluid card">
+    <div class="content">
+      <div class="header">
+        {{user.first_name}} {{user.last_name}}
+      </div>
+      <div class="meta">
+        {{cust.mobile_no}}
+      </div>
+      <div class="description">
+       {%if is_rent_paid%}
+       	Rent is already paid. Thank you
+       {%else%}
+       	Rent is not paid for this month.
+       	<h2><b>Rent Amount: </b>Rs.{{rent}}</h2>
+       {%endif%}
+      </div>
+    </div>
+    {%if not is_rent_paid%}
+    <div class="extra content">
+        <div class="ui fluid basic green button">Pay Bill</div>
+    </div>
+    {%endif%}
+  </div>
+{%endblock%}

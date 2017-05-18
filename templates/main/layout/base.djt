@@ -15,7 +15,7 @@
          <script src="{% static 'jquery-3.1.1.min.js' %}"></script>
     <body>
         <!--<img src="{% static 'header.png' %}" style="position:absolute;top:0px;left:0px;width:100%;"> -->
-        <div class="ui container" style="width:90%;">
+        <div class="ui container">
         	{%block content%}
         	{%endblock%}
         </div>
