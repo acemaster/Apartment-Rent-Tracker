@@ -2,27 +2,51 @@
 {% load staticfiles %}
 {%block content%}
 <br><br><br>
-<div class="ui fluid card">
-    <div class="content">
-      <div class="header">
-        {{user.first_name}} {{user.last_name}}
-      </div>
-      <div class="meta">
-        {{cust.mobile_no}}
-      </div>
-      <div class="description">
-       {%if is_rent_paid%}
-       	Rent is already paid. Thank you
-       {%else%}
-       	Rent is not paid for this month.
-       	<h2><b>Rent Amount: </b>Rs.{{rent}}</h2>
-       {%endif%}
-      </div>
+<h1>Year By Year Rent Details</h1>
+<div class="ui fluid selection dropdown">
+  <input type="hidden" name="user">
+  <i class="dropdown icon"></i>
+  <div class="default text">Select Year</div>
+  <div class="menu">
+    {%for year in years%}
+    <div class="item" data-value="{{year}}">
+      {{year}}
     </div>
-    {%if not is_rent_paid%}
-    <div class="extra content">
-        <div class="ui fluid basic green button">Pay Bill</div>
-    </div>
-    {%endif%}
+    {%endfor%}
   </div>
+</div>
+
+{%for year,months in calendar.items %}
+  <div class="ui fluid raised segment calendar_cards" id="{{year}}">
+    <h2>Rent Status for Year: {{year}}</h2>
+    <div class="ui grid">
+    {%for m in months%}
+      {%if m.1%}
+        <div class="two wide column">
+          <button class="ui green button">Month {{m.0}}: Paid</button>
+        </div>
+      {%else%}
+        <div class="two wide column">
+          <button class="ui red button">Month {{m.0}}: Not Paid</button>
+        </div>
+      {%endif%}
+    {%endfor%}
+    </div>
+  </div>
+{%endfor%}
+<br>
+<a class="ui green fluid button" href="/payamount/">Total Amount to Pay: {{total_to_pay}}</a>
+{%endblock%}
+{%block scripts%}
+<script>
+  $('.calendar_cards').hide();
+  $('.ui.dropdown').dropdown({
+    action: 'hide',
+    onChange: function(value, text, $selectedItem) {
+      $('.calendar_cards').hide();
+      $('#'+value).show();
+    }
+  })
+;
+</script>
 {%endblock%}

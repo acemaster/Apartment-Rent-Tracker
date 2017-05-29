@@ -8,3 +8,6 @@ from main.models import *
 
 
 admin.site.register(Customer)
+admin.site.register(Constant)
+admin.site.register(RentPayment)
+admin.site.register(Transaction)

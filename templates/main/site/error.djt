@@ -1,0 +1,8 @@
+{% extends "main/layout/base.djt" %}
+{% load staticfiles %}
+{%block content%}
+<br><br><br>
+<div class="ui segment">
+<h1>Error. Please try again</h1>
+</div>
+{%endblock%}
