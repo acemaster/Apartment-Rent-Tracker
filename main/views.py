@@ -151,9 +151,9 @@ def paymentconfirm(request):
 				for payment in t.rent_obj.all():
 					payment.rent_paid = True
 					payment.save()
-				return render(request,'main/site/finalmessage.djt',{'message':"Payment is successful"})
+				return render(request,'main/site/finalmessage.djt',{'success':True,'message':"Payment is successful."})
 		print result_dict
-		return render(request,'main/site/finalmessage.djt',{'message': "Payment error"})
+		return render(request,'main/site/finalmessage.djt',{'success':False,'message': "Payment error"})
 	else:
 		print result_dict['message']
 		return render(request,'main/site/error.djt',{})

@@ -4,5 +4,6 @@
 <br><br><br>
 <div class="ui segment">
 <h1>Error. Please try again</h1>
+<a href="Return to home" class="ui primary fluid button">Return to home</a>
 </div>
 {%endblock%}
