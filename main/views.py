@@ -161,7 +161,7 @@ def paymentconfirm(request):
 @csrf_exempt
 @require_POST
 def webhook(request):
-	data = dict(request.POST.iterlists())
+	data = request.POST.dict()
 	# data = json.loads(jsondata)
 	mac_provided = data['mac']
 	data.pop('mac',None)
