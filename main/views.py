@@ -164,6 +164,7 @@ def webhook(request):
 	data = request.POST
 	# data = json.loads(jsondata)
 	mac_provided = data['mac']
+	data.pop('mac',None)
 	message = "|".join(v for k, v in sorted(data.items(), key=lambda x: x[0].lower()))
 	# Pass the 'salt' without the <>.
 	salt = ""
@@ -180,7 +181,7 @@ def webhook(request):
 				payment.save()
 		else:
 			print "Error"
-		self.send_response(200)
+		return HttpResponse(status=200)
 	else:
-		self.send_response(400)
+		return HttpResponse(status=400)
 
