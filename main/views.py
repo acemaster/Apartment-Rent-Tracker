@@ -10,6 +10,7 @@ import hashlib
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import urlparse
 import datetime
+from django.conf import settings
 
 # Create your views here.
 def checkrent(cust,rent):
@@ -72,30 +73,51 @@ def payrent(request):
 		return render(request,'main/site/confirm.djt',response)
 	return render(request,'main/site/pay.djt',{})
 
-def createpayment(request):
-	cust_id = 1
+def createpayment(request,cust_id):
 	cust = Customer.objects.get(id=cust_id)
+	calendar,total_to_pay,payment_dict,years = checkrent(cust,cust.rent)
 	import requests
-	headers = { "X-Api-Key": "9affee63b17b104386ed8e711dfb45a6", "X-Auth-Token": "95d066dcb7b834e00cb575a0dde4a85f"}
+	headers = {}
+
+	if settings.DEBUG:
+		headers = {"X-Api-Key": settings.PAYMENT_API_CRED['dev_api_key'] , "X-Auth-Token": settings.PAYMENT_API_CRED['dev_auth_token']}
+	else:
+		headers = {"X-Api-Key": settings.PAYMENT_API_CRED['prod_api_key'] , "X-Auth-Token": settings.PAYMENT_API_CRED['prod_auth_token']}
+
 	payload = {
 	'purpose': 'Rent payment of ' + cust.user.first_name + " " + cust.user.last_name,
-	'amount': str(cust.rent),
+	'amount': total_to_pay,
 	'buyer_name': cust.user.first_name + " " + cust.user.last_name,
 	'email': 'vivekhtc25@gmail.com',
 	'phone': cust.mobile_no,
-	'redirect_url': '/paymentconfirm',
+	'redirect_url': 'http://www.google.com',
 	'send_email': 'True',
 	'send_sms': 'True',
-	'webhook': '/',
+	'webhook': 'http://www.google.com',
 	'allow_repeated_payments': 'False',
 	}
 	response = requests.post("https://test.instamojo.com/api/1.1/payment-requests/", data=payload, headers=headers)
 	result_dict = json.loads(response.text)
 	if result_dict['success']:
 		url = result_dict['payment_request']['longurl']
+		payment_id = result_dict['payment_request']['id']
+		t = Transaction()
+		t.payment_id = payment_id
+		t.cust = cust
+		t.save()
+		for payment in payment_dict:
+			r = RentPayment()
+			r.cust = cust
+			r.rent = payment['rent']
+			r.year = payment['year']
+			r.month = payment['month']
+			r.save()
+			t.rent_obj.add(r)
+			t.save()
 		print url
 		return redirect(url)
 	else:
+		print result_dict['message']
 		return render(request,'main/site/error.djt',{})
 
 # def paymentconfirm(request):
@@ -108,7 +130,12 @@ def webhook(request):
 	mac_provided = data.pop('mac')
 	message = "|".join(v for k, v in sorted(data.items(), key=lambda x: x[0].lower()))
 	# Pass the 'salt' without the <>.
-	mac_calculated = hmac.new("<YOUR_SALT>", message, hashlib.sha1).hexdigest()
+	salt = ""
+	if settings.DEBUG:
+		salt = settings.PAYMENT_API_CRED['dev_private_salt']
+	else:
+		salt = settings.PAYMENT_API_CRED['prod_private_salt']
+	mac_calculated = hmac.new(salt, message, hashlib.sha1).hexdigest()
 	if mac_provided == mac_calculated:
 		if data['status'] == "Credit":
 			print "Success"

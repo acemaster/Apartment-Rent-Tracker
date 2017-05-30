@@ -119,3 +119,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+#Instamojo creds
+PAYMENT_API_CRED = {
+    'prod_api_key': '#',
+    'prod_auth_token': '#',
+    'prod_private_salt' : '#',
+    'dev_api_key': '#',
+    'dev_auth_token': '#',
+    'dev_private_salt': '#',
+}

@@ -1,5 +1,6 @@
 {% extends "main/layout/base.djt" %}
 {% load staticfiles %}
+{%load customfilter%}
 {%block content%}
 <br><br><br>
 <h1>Year By Year Rent Details</h1>
@@ -23,11 +24,11 @@
     {%for m in months%}
       {%if m.1%}
         <div class="two wide column">
-          <button class="ui green button">Month {{m.0}}: Paid</button>
+          <button class="ui green button">Month {{m.0|month_name}}: Paid</button>
         </div>
       {%else%}
         <div class="two wide column">
-          <button class="ui red button">Month {{m.0}}: Not Paid</button>
+          <button class="ui red button">Month {{m.0|month_name}}: Not Paid</button>
         </div>
       {%endif%}
     {%endfor%}
@@ -35,10 +36,42 @@
   </div>
 {%endfor%}
 <br>
-<a class="ui green fluid button" href="/payamount/">Total Amount to Pay: {{total_to_pay}}</a>
+<div class="ui styled fluid accordion">
+  <div class="title">
+    <i class="dropdown icon"></i>
+    Full rent Bill
+  </div>
+  <div class="content">
+    <table class="ui celled table">
+      <thead>
+        <tr><th>Rent Month</th>
+        <th>Rent Year</th>
+        <th>Rent Amount</th>
+      </tr></thead>
+      <tbody>
+      {%for payment in payment_dict%}
+        <tr>
+          <td>{{payment.month|month_name}}</td>
+          <td>{{payment.year}}</td>
+          <td>{{payment.rent}}</td>
+        </tr>
+      {%endfor%}
+      <tr>
+        <td>Total Amount</td>
+        <td> = </td>
+        <td>{{total_to_pay}}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+<br>
+<a class="ui green fluid button" href="/startpayment/{{cust.id}}">Total Amount to Pay: {{total_to_pay}}</a>
 {%endblock%}
 {%block scripts%}
 <script>
+  $('.ui.accordion')
+  .accordion()
+;
   $('.calendar_cards').hide();
   $('.ui.dropdown').dropdown({
     action: 'hide',

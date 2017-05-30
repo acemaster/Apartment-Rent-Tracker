@@ -33,7 +33,7 @@ class RentPayment(models.Model):
     Rent Payment with month and year
     """
     cust = models.ForeignKey(Customer)
-    rent_paid = models.BooleanField(default=True)
+    rent_paid = models.BooleanField(default=False)
     rent = models.CharField(max_length=100)
     year = models.CharField(max_length=100)
     month = models.CharField(max_length=100)
@@ -48,7 +48,7 @@ class Transaction(models.Model):
     payment_id = models.CharField(max_length=100)
     cust = models.ForeignKey(Customer)
     create_date = models.DateTimeField(auto_now=True)
-    rent_obj = models.ForeignKey(RentPayment)
+    rent_obj = models.ManyToManyField(RentPayment)
     def __unicode__(self):
         return self.payment_id
 
