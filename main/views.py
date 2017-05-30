@@ -162,7 +162,7 @@ def paymentconfirm(request):
 @require_POST
 def webhook(request):
 	jsondata = request.POST
-	data = json.loads(jsondata)
+	# data = json.loads(jsondata)
 	mac_provided = data['mac']
 	message = "|".join(v for k, v in sorted(data.items(), key=lambda x: x[0].lower()))
 	# Pass the 'salt' without the <>.
