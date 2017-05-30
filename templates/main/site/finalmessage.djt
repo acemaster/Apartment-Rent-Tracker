@@ -2,13 +2,13 @@
 {% load staticfiles %}
 {%block content%}
 <br><br><br>
-<div class="ui centered segment">
+<div class="ui center aligned segment">
 {%if success%}
 <i class="massive check green circle icon"></i>
 {%else%}
-<i class="massive remove circle icon"></i>
+<i class="massive remove red circle icon"></i>
 {%endif%}
 <h1>{{message}}</h1>
-<a href="Return to home" class="ui primary fluid button">Return to home</a>
+<a href="/" class="ui primary fluid button">Return to home</a>
 </div>
 {%endblock%}

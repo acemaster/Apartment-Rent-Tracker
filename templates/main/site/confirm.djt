@@ -65,7 +65,11 @@
   </div>
 </div>
 <br>
+{%if total_to_pay > 0 %}
 <a class="ui green fluid button" href="/startpayment/{{cust.id}}">Total Amount to Pay: {{total_to_pay}}</a>
+{%else%}
+<a class="ui green fluid disabled button" href="/startpayment/{{cust.id}}">No Rent to Pay</a>
+{%endif%}
 {%endblock%}
 {%block scripts%}
 <script>

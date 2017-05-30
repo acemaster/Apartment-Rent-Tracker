@@ -175,7 +175,7 @@ def webhook(request):
 	mac_calculated = hmac.new(salt, message, hashlib.sha1).hexdigest()
 	if mac_provided == mac_calculated:
 		if data['status'] == "Credit":
-			t = Transaction.objects.get(payment_id = payment_request_id)
+			t = Transaction.objects.get(payment_id = data['payment_request_id'])
 			for payment in t.rent_obj.all():
 				payment.rent_paid = True
 				payment.save()
