@@ -90,7 +90,7 @@ def createpayment(request,cust_id):
 		headers = {"X-Api-Key": settings.PAYMENT_API_CRED['prod_api_key'] , "X-Auth-Token": settings.PAYMENT_API_CRED['prod_auth_token']}
 
 	payload = {
-	'purpose': 'Rent payment of ' + cust.user.first_name + " " + cust.user.last_name,
+	'purpose': 'Rent payment of ' + cust.user.first_name,
 	'amount': total_to_pay,
 	'buyer_name': cust.user.first_name + " " + cust.user.last_name,
 	'email': 'vivekhtc25@gmail.com',
