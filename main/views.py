@@ -139,15 +139,16 @@ def paymentconfirm(request):
 	response = requests.get( API_BASE_URL+"payment-requests/"+payment_request_id+"/", headers=headers)
 	result_dict = json.loads(response.text)
 	if result_dict['success']:
-		if result_dict['payment_request']['status'] == 'Credit':
-			t = Transaction.objects.get(payment_id = payment_request_id)
-			for payment in t.rent_obj.all():
-				payment.rent_paid = True
-				payment.save()
-			return render(request,'main/site/finalmessage.djt',{'message':"Payment is successful"})
-		else:
-			print result_dict
-			return render(request,'main/site/finalmessage.djt',{'message': "Payment error"})
+		payments_made = result_dict['payment_request']['payments']
+		for p in payments_made:
+			if p['status'] == 'Credit':
+				t = Transaction.objects.get(payment_id = payment_request_id)
+				for payment in t.rent_obj.all():
+					payment.rent_paid = True
+					payment.save()
+				return render(request,'main/site/finalmessage.djt',{'message':"Payment is successful"})
+		print result_dict
+		return render(request,'main/site/finalmessage.djt',{'message': "Payment error"})
 	else:
 		print result_dict['message']
 		return render(request,'main/site/error.djt',{})
