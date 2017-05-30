@@ -146,12 +146,14 @@ def paymentconfirm(request):
 				payment.save()
 			return render(request,'main/site/finalmessage.djt',{'message':"Payment is successful"})
 		else:
+			print result_dict
 			return render(request,'main/site/finalmessage.djt',{'message': "Payment error"})
 	else:
 		print result_dict['message']
 		return render(request,'main/site/error.djt',{})
 
-
+@csrf_exempt
+@require_POST
 def webhook(request):
 	jsondata = request.body
 	data = json.loads(jsondata)
