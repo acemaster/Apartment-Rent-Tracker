@@ -95,10 +95,10 @@ def createpayment(request,cust_id):
 	'buyer_name': cust.user.first_name + " " + cust.user.last_name,
 	'email': 'vivekhtc25@gmail.com',
 	'phone': cust.mobile_no,
-	'redirect_url': settings.PAYMENT_API_CRED['dev_base_url']+settings.PAYMENT_API_CRED['redirect_url'],
+	'redirect_url': settings.PAYMENT_API_CRED['prod_base_url']+settings.PAYMENT_API_CRED['redirect_url'],
 	'send_email': 'True',
 	'send_sms': 'True',
-	'webhook': settings.PAYMENT_API_CRED['dev_base_url']+settings.PAYMENT_API_CRED['webhook_url'],
+	'webhook': settings.PAYMENT_API_CRED['prod_base_url']+settings.PAYMENT_API_CRED['webhook_url'],
 	'allow_repeated_payments': 'False',
 	}
 	response = requests.post(API_BASE_URL + "payment-requests/", data=payload, headers=headers)
