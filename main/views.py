@@ -111,14 +111,19 @@ def createpayment(request,cust_id):
 		t.cust = cust
 		t.save()
 		for payment in payment_dict:
-			r = RentPayment()
-			r.cust = cust
-			r.rent = payment['rent']
-			r.year = payment['year']
-			r.month = payment['month']
-			r.save()
-			t.rent_obj.add(r)
-			t.save()
+			try:
+				r = RentPayment.objects.get(cust=cust,month=payment['month'],year=payment['year'])
+				t.rent_obj.add(r)
+				t.save()
+			except:
+				r = RentPayment()
+				r.cust = cust
+				r.rent = payment['rent']
+				r.year = payment['year']
+				r.month = payment['month']
+				r.save()
+				t.rent_obj.add(r)
+				t.save()
 		print url
 		return redirect(url)
 	else:
@@ -156,7 +161,7 @@ def paymentconfirm(request):
 @csrf_exempt
 @require_POST
 def webhook(request):
-	jsondata = request.body
+	jsondata = request.POST
 	data = json.loads(jsondata)
 	mac_provided = data['mac']
 	message = "|".join(v for k, v in sorted(data.items(), key=lambda x: x[0].lower()))
