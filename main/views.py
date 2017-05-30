@@ -11,6 +11,10 @@ from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import urlparse
 import datetime
 from django.conf import settings
+import requests
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
 
 # Create your views here.
 def checkrent(cust,rent):
@@ -76,12 +80,13 @@ def payrent(request):
 def createpayment(request,cust_id):
 	cust = Customer.objects.get(id=cust_id)
 	calendar,total_to_pay,payment_dict,years = checkrent(cust,cust.rent)
-	import requests
 	headers = {}
-
+	API_BASE_URL = ""
 	if settings.DEBUG:
+		API_BASE_URL = settings.PAYMENT_API_CRED['dev_url']
 		headers = {"X-Api-Key": settings.PAYMENT_API_CRED['dev_api_key'] , "X-Auth-Token": settings.PAYMENT_API_CRED['dev_auth_token']}
 	else:
+		API_BASE_URL = settings.PAYMENT_API_CRED['prod_url']
 		headers = {"X-Api-Key": settings.PAYMENT_API_CRED['prod_api_key'] , "X-Auth-Token": settings.PAYMENT_API_CRED['prod_auth_token']}
 
 	payload = {
@@ -90,13 +95,13 @@ def createpayment(request,cust_id):
 	'buyer_name': cust.user.first_name + " " + cust.user.last_name,
 	'email': 'vivekhtc25@gmail.com',
 	'phone': cust.mobile_no,
-	'redirect_url': 'http://www.google.com',
+	'redirect_url': settings.PAYMENT_API_CRED['dev_base_url']+settings.PAYMENT_API_CRED['redirect_url'],
 	'send_email': 'True',
 	'send_sms': 'True',
-	'webhook': 'http://www.google.com',
+	'webhook': settings.PAYMENT_API_CRED['dev_base_url']+settings.PAYMENT_API_CRED['webhook_url'],
 	'allow_repeated_payments': 'False',
 	}
-	response = requests.post("https://test.instamojo.com/api/1.1/payment-requests/", data=payload, headers=headers)
+	response = requests.post(API_BASE_URL + "payment-requests/", data=payload, headers=headers)
 	result_dict = json.loads(response.text)
 	if result_dict['success']:
 		url = result_dict['payment_request']['longurl']
@@ -120,14 +125,37 @@ def createpayment(request,cust_id):
 		print result_dict['message']
 		return render(request,'main/site/error.djt',{})
 
-# def paymentconfirm(request):
+def paymentconfirm(request):
+	payment_id = request.GET['payment_id']
+	payment_request_id = request.GET['payment_request_id']
+	API_BASE_URL = ""
+	headers = {}
+	if settings.DEBUG:
+		API_BASE_URL = settings.PAYMENT_API_CRED['dev_url']
+		headers = {"X-Api-Key": settings.PAYMENT_API_CRED['dev_api_key'] , "X-Auth-Token": settings.PAYMENT_API_CRED['dev_auth_token']}
+	else:
+		API_BASE_URL = settings.PAYMENT_API_CRED['prod_url']
+		headers = {"X-Api-Key": settings.PAYMENT_API_CRED['prod_api_key'] , "X-Auth-Token": settings.PAYMENT_API_CRED['prod_auth_token']}
+	response = requests.get( API_BASE_URL+"payment-requests/"+payment_request_id+"/", headers=headers)
+	result_dict = json.loads(response.text)
+	if result_dict['success']:
+		if result_dict['payment_request']['status'] == 'Credit':
+			t = Transaction.objects.get(payment_id = payment_request_id)
+			for payment in t.rent_obj.all():
+				payment.rent_paid = True
+				payment.save()
+			return render(request,'main/site/finalmessage.djt',{'message':"Payment is successful"})
+		else:
+			return render(request,'main/site/finalmessage.djt',{'message': "Payment error"})
+	else:
+		print result_dict['message']
+		return render(request,'main/site/error.djt',{})
 
 
 def webhook(request):
-	content_length = int(self.headers['content-length'])
-	querystring = self.rfile.read(content_length)
-	data = urlparse.parse_qs(querystring)
-	mac_provided = data.pop('mac')
+	jsondata = request.body
+	data = json.loads(jsondata)
+	mac_provided = data['mac']
 	message = "|".join(v for k, v in sorted(data.items(), key=lambda x: x[0].lower()))
 	# Pass the 'salt' without the <>.
 	salt = ""
@@ -138,7 +166,10 @@ def webhook(request):
 	mac_calculated = hmac.new(salt, message, hashlib.sha1).hexdigest()
 	if mac_provided == mac_calculated:
 		if data['status'] == "Credit":
-			print "Success"
+			t = Transaction.objects.get(payment_id = payment_request_id)
+			for payment in t.rent_obj.all():
+				payment.rent_paid = True
+				payment.save()
 		else:
 			print "Error"
 		self.send_response(200)
