@@ -152,6 +152,7 @@ def paymentconfirm(request):
 				for payment in t.rent_obj.all():
 					payment.rent_paid = True
 					payment.save()
+				t.cust.total_rent_to_pay = 0
 				return render(request,'main/site/finalmessage.djt',{'success':True,'message':"Payment is successful."})
 		print result_dict
 		return render(request,'main/site/finalmessage.djt',{'success':False,'message': "Payment error"})
@@ -180,6 +181,7 @@ def webhook(request):
 			for payment in t.rent_obj.all():
 				payment.rent_paid = True
 				payment.save()
+			t.cust.total_rent_to_pay = 0
 		else:
 			print "Error"
 		return HttpResponse(status=200)

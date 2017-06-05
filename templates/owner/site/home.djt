@@ -1,0 +1,84 @@
+{% extends "owner/layout/base.djt" %}
+{% load staticfiles %}
+{%block content%}
+<br><br><br>
+<div class="ui center aligned segment">
+<h1>Home</h1>
+<div class="ui grid">
+  <div class="four wide column">
+    <div class="ui vertical fluid tabular menu">
+      <a class="active item" data-segment="summary">
+        Summary
+      </a>
+      <a class="item" data-segment="customers">
+        Customers
+      </a>
+    </div>
+  </div>
+  <div class="twelve wide stretched column">
+    <div id="summary" class="ui segment menu-segment">
+      <h2><b>Total Earnings: </b> : {{total_earnings}}</h2>
+      <div class="ui divider"></div>
+      {%if customers_not_paid%}
+      <h2>Customers not paid</h2>
+      <br>
+      <table class="ui table">
+      {%for c in customers_not_paid %}
+      <tr>
+      	<td>{{c.user.first_name}} {{c.user.last_name}}</td>
+      	<td>{{c.mobile_no}}</td>
+      	<td>{{c.total_rent_to_pay}}</td>
+      	<td><a class="ui green button" href="/adminpanel/sendsms/{{c.mobile_no}}">Send SMS</a></td>
+      </tr>
+      {%endfor%}
+      </table>
+      {%else%}
+      	<p>All customers have paid their rent</p>
+      {%endif%}
+    </div>
+    <div id="customers" class="ui segment menu-segment">
+      <h2>Customers</h2>
+      <br>
+      <a href="/adminpanel/addcust/" class="ui blue fluid button">Add Customer</a>
+      <div class="ui divider"></div>
+      <table class="ui celled table">
+      <thead>
+      	<tr>
+      		<th>Name</th>
+      		<th>Mobile No</th>
+      		<th>Rent to Pay</th>
+      		<th>View</th>
+      		<th>Send Reminder</th>
+      	</tr>
+      </thead>
+      <tbody>
+      {%for c in customers %}
+      <tr>
+      	<td>{{c.user.first_name}} {{c.user.last_name}}</td>
+      	<td>{{c.mobile_no}}</td>
+      	<td>{{c.total_rent_to_pay}}</td>
+      	<td><a href="/adminpanel/getcustinfo/{{c.id}}" class="ui green fluid button">View Customer</a></td>
+      	<td><a href="/adminpanel/sendsms/{{c.id}}" class="ui yellow fluid button">Send SMS</a></td>
+      </tr>
+      {%endfor%}
+      </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+{%endblock%}
+{%block scripts%}
+<script>
+$(document).ready(function(){
+	$('.menu-segment').hide();
+	$('#summary').show();
+});
+$('.item').click(function(){
+	$('.menu').children().removeClass('active');
+	$(this).addClass('active');
+	$('.menu-segment').hide()
+	$('#'+$(this).attr('data-segment')).show();
+});
+</script>
+{%endblock%}

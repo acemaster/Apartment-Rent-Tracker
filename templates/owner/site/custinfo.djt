@@ -1,0 +1,95 @@
+{% extends "main/layout/base.djt" %}
+{% load staticfiles %}
+{%load customfilter%}
+{%block content%}
+{%if success%}
+<br>
+<a href="/adminpanel/" class="ui green fluid button"><i class="chevron left icon"></i> Go Back Home</a>
+<br><br><br>
+<h1>Year By Year Rent Details</h1>
+<div class="ui fluid selection dropdown">
+  <input type="hidden" name="user">
+  <i class="dropdown icon"></i>
+  <div class="default text">Select Year</div>
+  <div class="menu">
+    {%for year in years%}
+    <div class="item" data-value="{{year}}">
+      {{year}}
+    </div>
+    {%endfor%}
+  </div>
+</div>
+
+{%for year,months in calendar.items %}
+  <div class="ui fluid raised segment calendar_cards" id="{{year}}">
+    <h2>Rent Status for Year: {{year}}</h2>
+    <div class="ui grid">
+    {%for m in months%}
+      {%if m.1%}
+        <div class="two wide column">
+          <button class="ui green button">Month {{m.0|month_name}}: Paid</button>
+        </div>
+      {%else%}
+        <div class="two wide column">
+          <button class="ui red button">Month {{m.0|month_name}}: Not Paid</button>
+        </div>
+      {%endif%}
+    {%endfor%}
+    </div>
+  </div>
+{%endfor%}
+<br>
+<div class="ui styled fluid accordion">
+  <div class="title">
+    <i class="dropdown icon"></i>
+    Full rent Bill
+  </div>
+  <div class="content">
+    <table class="ui celled table">
+      <thead>
+        <tr><th>Rent Month</th>
+        <th>Rent Year</th>
+        <th>Rent Amount</th>
+      </tr></thead>
+      <tbody>
+      {%for payment in payment_dict%}
+        <tr>
+          <td>{{payment.month|month_name}}</td>
+          <td>{{payment.year}}</td>
+          <td>{{payment.rent}}</td>
+        </tr>
+      {%endfor%}
+      <tr>
+        <td>Total Amount</td>
+        <td> = </td>
+        <td>{{total_to_pay}}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+<br>
+{%if total_to_pay > 0 %}
+<a class="ui green fluid button" href="/startpayment/{{cust.id}}">Total Amount to Pay: {{total_to_pay}}</a>
+{%else%}
+<a class="ui green fluid disabled button" href="/startpayment/{{cust.id}}">No Rent to Pay</a>
+{%endif%}
+{%else%}
+<h1>Customer Not Found</h1>
+{%endif%}
+{%endblock%}
+{%block scripts%}
+<script>
+  $('.ui.accordion')
+  .accordion()
+;
+  $('.calendar_cards').hide();
+  $('.ui.dropdown').dropdown({
+    action: 'hide',
+    onChange: function(value, text, $selectedItem) {
+      $('.calendar_cards').hide();
+      $('#'+value).show();
+    }
+  })
+;
+</script>
+{%endblock%}

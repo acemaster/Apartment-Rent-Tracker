@@ -1,0 +1,27 @@
+{% extends "owner/layout/base.djt" %}
+{% load staticfiles %}
+{%block content%}
+<br><br><br>
+<h1>Add Customer</h1>
+<div class="ui divider"></div>
+<form action="/adminpanel/addcust/" method="POST" class="ui form">
+	{%csrf_token%}
+	<div class="ui field">
+		<label for="name">Enter Full Name:</label>
+		<input id="name" name="name" type="text" placeholder="Eg: Vivek Unnikrishnan">
+	</div>
+	<div class="ui field">
+		<label for="email">Enter Email Id</label>
+		<input id="email" name="email" type="email" placeholder="Eg: vivek@vivek.com">
+	</div>
+	<div class="ui field">
+		<label for="mobile_no">Enter Mobile No:</label>
+		<input id="mobile_no" name="mobile_no" type="text" placeholder="Eg: 999999999">
+	</div>
+	<div class="ui field">
+		<label for="rent">Rent to Pay:</label>
+		<input id="rent" name="rent" type="text" placeholder="Eg: 400">
+	</div>
+	<button class="ui green fluid button" type="submit">Add Customer</button>
+</form>
+{%endblock%}
